@@ -38,10 +38,10 @@ If ($BuildNumber) {
     If ($BuildNumber -as [int] -gt 65534) {
         Throw "Build number too large"
     }
-    $Version = "2.7.0.$BuildNumber"
+    $Version = "2.8.0.$BuildNumber"
     If ($env:TRAVIS_TAG) {
-        If ($env:TRAVIS_TAG -match "^v\d+\.\d+\.\d+$") {
-            $Version = "$($env:TRAVIS_TAG.Substring(1)).$BuildNumber"
+        If ($env:TRAVIS_TAG -match "^v(\d+\.\d+\.\d+)(-\d+)?$") {
+            $Version = "$($matches[1]).$BuildNumber"
         } Else {
             Write-Error "Badly formed or non-release git tag ""$($env:TRAVIS_TAG)"""
         }
@@ -58,6 +58,9 @@ Write-Host -ForegroundColor Blue @"
 *
 *
 "@
+
+Write-Host "Environment is:"
+Get-ChildItem env:* | Sort-Object Name
 
 Write-Host "Path is:"
 Get-ChildItem env:PATH | ForEach-Object { $_.Value.Split(';') }
@@ -155,12 +158,17 @@ Write-Host -ForegroundColor Green @"
 
 "@
 
-$zip_root = "dll"
+$dll_root = "dll"
 $underscore_version = $Version.Replace(".", "_")
-New-Item -ItemType "directory" -Path $zip_root -Force | Foreach-Object { "Created directory $($_.FullName)" }
-Move-Item x64-vcruntime140-ruby280.dll $zip_root
-Move-Item x64-vcruntime140-ruby280.lib $zip_root
-Move-Item x64-vcruntime140-ruby280.pdb $zip_root
-Compress-Archive -Path include,$zip_root -DestinationPath MushRuby_${underscore_version}_${Configuration}.zip
+
+# Copy generated config.h into include directory
+(Get-Content ".ext\include\x64-mswin64_140\ruby\config.h") -replace "#error","// #error" | Set-Content -Force "include\ruby\config.h"
+
+New-Item -ItemType "directory" -Path $dll_root -Force | Foreach-Object { "Created directory $($_.FullName)" }
+Move-Item -Force x64-vcruntime140-ruby280.dll $dll_root
+Move-Item -Force x64-vcruntime140-ruby280.lib $dll_root
+Move-Item -Force x64-vcruntime140-ruby280.pdb $dll_root
+Get-FileHash $dll_root/* -Algorithm SHA256 | Format-List
+Compress-Archive -Path include,$dll_root -DestinationPath MushRuby_${underscore_version}_${Configuration}.zip
 
 Write-Host -ForegroundColor Blue "$Configuration build complete for Mushware Ruby DLL version $Version"

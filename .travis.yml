@@ -1,8 +1,7 @@
+
 before_deploy:
 - git config --local user.name "Mushware Machine"
 - git config --local user.email "machine@mushware.com"
-before_script:
-- "$BEFORE_SCRIPT"
 deploy:
   edge: true
   file: MushRuby*.zip
@@ -23,8 +22,6 @@ git:
 language: cpp
 os: windows
 script:
-- unset BEFORE_SCRIPT
-- unset BEFORE_SCRIPT_TOKEN
 - unset CC
 - unset CC_FOR_BUILD
 - unset CXX
