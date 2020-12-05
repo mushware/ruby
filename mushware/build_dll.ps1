@@ -109,7 +109,7 @@ If (Test-Path $msys_root) {
 pacman --noconfirm --sync autoconf=2.69-5
 pacman --noconfirm --sync bison=3.6.4-1
 pacman --noconfirm --sync patch=2.7.6-1
-pacman --noconfirm --sync ruby=2.7.1-1
+pacman --noconfirm --sync ruby
 
 Write-Host -ForegroundColor DarkCyan @"
 
