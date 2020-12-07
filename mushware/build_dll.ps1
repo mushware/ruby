@@ -172,9 +172,9 @@ $underscore_version = $Version.Replace(".", "_")
 (Get-Content ".ext\include\x64-mswin64_140\ruby\config.h") -replace "#error","// #error" | Set-Content -Force "include\ruby\config.h"
 
 New-Item -ItemType "directory" -Path $dll_root -Force | Foreach-Object { "Created directory $($_.FullName)" }
-Move-Item -Force x64-vcruntime140-ruby280.dll $dll_root
-Move-Item -Force x64-vcruntime140-ruby280.lib $dll_root
-Move-Item -Force x64-vcruntime140-ruby280.pdb $dll_root
+Move-Item -Force x64-vcruntime140-ruby300.dll $dll_root
+Move-Item -Force x64-vcruntime140-ruby300.lib $dll_root
+Move-Item -Force x64-vcruntime140-ruby300.pdb $dll_root
 Get-FileHash $dll_root/* -Algorithm SHA256 | Format-List
 Compress-Archive -Path include,$dll_root -DestinationPath MushRuby_${Configuration}_${underscore_version}.zip
 
