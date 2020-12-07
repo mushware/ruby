@@ -140,7 +140,14 @@ If ($Configuration -eq "Debug") {
 }
 win32/configure.bat $configure_args
 
-$build_process = Start-Process -NoNewWindow -PassThru -FilePath "nmake.exe" -ArgumentList "miniruby.exe", ".rbconfig.time", "lib", "dll"
+$build_args = @("miniruby.exe", ".rbconfig.time", "lib", "dll")
+If ($Configuration -eq "Debug") {
+    $build_args += "LDFLAGS=`"-incremental:no -debug -opt:ref -opt:icf /NODEFAULTLIB:LIBCMT`""
+    $build_args += "OPTFLAGS=`"-Od -Ob0`""
+    $build_args += "RUNTIMEFLAG=-MDd"
+}
+
+$build_process = Start-Process -NoNewWindow -PassThru -FilePath "nmake.exe" -ArgumentList $build_args
 $handle = $build_process.Handle # Fix for missing ExitCode
 $build_process.WaitForExit()
 
